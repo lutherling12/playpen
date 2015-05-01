@@ -1,2 +1,2 @@
 # playpen
-Place for learning and tinkering
+Place for learning and tinkering.
