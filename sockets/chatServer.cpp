@@ -12,7 +12,7 @@
 int main (int argc, char * argv [])
 {
   const char* ip = "127.0.0.1";
-  const char* port = "50008";
+  const char* port = "50003";
 
   struct addrinfo config;
     memset(&config, 0, sizeof(struct addrinfo));
@@ -56,14 +56,18 @@ int main (int argc, char * argv [])
   printf ("Server Binded.\n");
 
   listen (sfd, 5);
-  int nsfd = accept (sfd, cliaddr.ai_addr, &cliaddr.ai_addrlen);
-  int nsfd2 = accept (sfd, cliaddr.ai_addr, &cliaddr.ai_addrlen);
+  int fdClient1 = accept (sfd, cliaddr.ai_addr, &cliaddr.ai_addrlen);
+  int fdClient2 = accept (sfd, cliaddr.ai_addr, &cliaddr.ai_addrlen);
 
   for (;;) {
-    if (recv (nsfd, msg, CHAR_LIMIT, MSG_DONTWAIT) > 0)
+    if (recv (fdClient1, msg, CHAR_LIMIT, MSG_DONTWAIT) > 0) {
+      send (fdClient2, msg, sizeof(msg), 0);
       printf ("%s", msg);
-    if (recv (nsfd2, msg, CHAR_LIMIT, MSG_DONTWAIT) > 0)
+    }
+    if (recv (fdClient2, msg, CHAR_LIMIT, MSG_DONTWAIT) > 0) {
+      send (fdClient1, msg, sizeof(msg), 0);
       printf ("%s", msg);
+    }
   }
 
   close (sfd);
