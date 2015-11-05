@@ -11,7 +11,7 @@
 
 int main (int argc, char * argv [])
 {
-  const char* ip = "192.168.0.13";
+  const char* ip = "127.0.0.1";
   const char* port = "50008";
 
   struct addrinfo config;
@@ -34,11 +34,11 @@ int main (int argc, char * argv [])
   if (gai != 0) {
     fprintf (stderr, "getaddrinfo: %s\n", gai_strerror(gai));
     exit (EXIT_FAILURE);
-  }    
+  }
 
   int sfd = socket (
-    results->ai_family, 
-    results->ai_socktype, 
+    results->ai_family,
+    results->ai_socktype,
     results->ai_protocol
   );
 
@@ -56,12 +56,14 @@ int main (int argc, char * argv [])
   printf ("Server Binded.\n");
 
   listen (sfd, 5);
-  int nsfd = -1;
+  int nsfd = accept (sfd, cliaddr.ai_addr, &cliaddr.ai_addrlen);
+  int nsfd2 = accept (sfd, cliaddr.ai_addr, &cliaddr.ai_addrlen);
 
-  for (;;) { 
-    nsfd = accept (sfd, cliaddr.ai_addr, &cliaddr.ai_addrlen);
-    if (recv (nsfd, msg, CHAR_LIMIT, 0) > 0)
-      printf ("%s\n", msg);
+  for (;;) {
+    if (recv (nsfd, msg, CHAR_LIMIT, MSG_DONTWAIT) > 0)
+      printf ("%s", msg);
+    if (recv (nsfd2, msg, CHAR_LIMIT, MSG_DONTWAIT) > 0)
+      printf ("%s", msg);
   }
 
   close (sfd);
