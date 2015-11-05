@@ -25,6 +25,8 @@ int main (int argc, char * argv [])
     config.ai_next = NULL;
 
   struct addrinfo* results = NULL;
+  struct addrinfo cliaddr;
+    memset(&cliaddr, 0, sizeof(struct addrinfo));
 
   char msg [CHAR_LIMIT];
 
@@ -53,7 +55,11 @@ int main (int argc, char * argv [])
   freeaddrinfo (results);
   printf ("Server Binded.\n");
 
-  for (;;) {
+  listen (sfd, 5);
+
+  int nsfd = accept (sfd, cliaddr.ai_addr, &cliaddr.ai_addrlen);
+
+  for (;;) { 
     if (recv (sfd, msg, CHAR_LIMIT, 0) > 0)
       printf ("%s\n", msg);
   }
