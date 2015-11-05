@@ -9,10 +9,13 @@
 
 #define CHAR_LIMIT 2048
 
+void* sendMsg (void* arg);
+void* recvMsg (void* arg);
+
 int main (int argc, char * argv[])
 {
   const char* ip = "127.0.0.1";
-  const char* port = "50008";
+  const char* port = "50003";
 
   struct addrinfo config;
     memset (&config, 0, sizeof(struct addrinfo));
@@ -21,7 +24,7 @@ int main (int argc, char * argv[])
 
   struct addrinfo* results;
 
-  char msg [CHAR_LIMIT];
+  pthread_t threads[2];
 
   int gai = getaddrinfo (ip, port, &config, &results);
   if (gai != 0) {
@@ -47,11 +50,32 @@ int main (int argc, char * argv[])
 
   freeaddrinfo (results);
 
+  pthread_create (&threads[0], NULL, sendMsg, &sfd);
+  pthread_create (&threads[1], NULL, recvMsg, &sfd);
+
+  pthread_exit (NULL);
+}
+
+void* sendMsg (void* arg) {
+  char msg [CHAR_LIMIT];
+    memset (&msg, 0, sizeof(msg));
+
+  int sfd = (*(int*)arg);
+
   for (;;) {
     fgets (msg, CHAR_LIMIT, stdin);
     send (sfd, msg, sizeof(msg), 0);
   }
+}
 
-  close (sfd);
-  return 0;
+void* recvMsg (void* arg) {
+  char msg [CHAR_LIMIT];
+    memset (&msg, 0, sizeof(msg));
+
+  int sfd = (*(int*)arg);
+
+  for (;;) {
+    if (recv (sfd, msg, sizeof(msg), MSG_DONTWAIT) > 0)
+      printf ("%s", msg);
+  }
 }
