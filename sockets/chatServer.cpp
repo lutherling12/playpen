@@ -56,11 +56,11 @@ int main (int argc, char * argv [])
   printf ("Server Binded.\n");
 
   listen (sfd, 5);
-
-  int nsfd = accept (sfd, cliaddr.ai_addr, &cliaddr.ai_addrlen);
+  int nsfd = -1;
 
   for (;;) { 
-    if (recv (sfd, msg, CHAR_LIMIT, 0) > 0)
+    nsfd = accept (sfd, cliaddr.ai_addr, &cliaddr.ai_addrlen);
+    if (recv (nsfd, msg, CHAR_LIMIT, 0) > 0)
       printf ("%s\n", msg);
   }
 
