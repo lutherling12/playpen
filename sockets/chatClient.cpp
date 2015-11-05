@@ -11,15 +11,17 @@
 
 int main (int argc, char * argv[])
 {
-  const char* ip = "192.168.0.13";
+  const char* ip = "127.0.0.1";
   const char* port = "50008";
 
   struct addrinfo config;
     memset (&config, 0, sizeof(struct addrinfo));
     config.ai_family = AF_UNSPEC;
     config.ai_socktype = SOCK_STREAM;
-   
+
   struct addrinfo* results;
+
+  char msg [CHAR_LIMIT];
 
   int gai = getaddrinfo (ip, port, &config, &results);
   if (gai != 0) {
@@ -28,8 +30,8 @@ int main (int argc, char * argv[])
   }
 
   int sfd = socket (
-    results->ai_family, 
-    results->ai_socktype, 
+    results->ai_family,
+    results->ai_socktype,
     results->ai_protocol
   );
 
@@ -45,7 +47,10 @@ int main (int argc, char * argv[])
 
   freeaddrinfo (results);
 
-  send (sfd, "Hello", sizeof("Hello"), 0);
+  for (;;) {
+    fgets (msg, CHAR_LIMIT, stdin);
+    send (sfd, msg, sizeof(msg), 0);
+  }
 
   close (sfd);
   return 0;
