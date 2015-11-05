@@ -28,7 +28,7 @@ int main (int argc, char * argv [])
   struct addrinfo cliaddr;
     memset(&cliaddr, 0, sizeof(struct addrinfo));
 
-  char msg [CHAR_LIMIT];
+  char msg [CHAR_LIMIT] = "";
 
   int gai = getaddrinfo (ip, port, &config, &results);
   if (gai != 0) {
@@ -60,8 +60,9 @@ int main (int argc, char * argv [])
 
   for (;;) { 
     nsfd = accept (sfd, cliaddr.ai_addr, &cliaddr.ai_addrlen);
-    if (recv (nsfd, msg, CHAR_LIMIT, 0) > 0)
-      printf ("%s\n", msg);
+    if (recv (nsfd, msg, CHAR_LIMIT-1, 0) > 0)
+      printf ("%s", msg);
+    memset (msg, 0, sizeof(msg));
   }
 
   close (sfd);

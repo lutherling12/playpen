@@ -21,6 +21,9 @@ int main (int argc, char * argv[])
    
   struct addrinfo* results;
 
+  char msg[CHAR_LIMIT] = "";
+  // const char* msg = "Hello\n";
+
   int gai = getaddrinfo (ip, port, &config, &results);
   if (gai != 0) {
     fprintf (stderr, "getaddrinfo: %s\n", gai_strerror(gai));
@@ -44,8 +47,11 @@ int main (int argc, char * argv[])
   }
 
   freeaddrinfo (results);
-
-  send (sfd, "Hello", sizeof("Hello"), 0);
+  
+  for (;;) {
+    fgets (msg, CHAR_LIMIT, stdin);
+    send (sfd, msg, sizeof(msg), 0);
+  }
 
   close (sfd);
   return 0;
