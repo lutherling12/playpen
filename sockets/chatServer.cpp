@@ -56,10 +56,9 @@ int main (int argc, char * argv [])
   printf ("Server Binded.\n");
 
   listen (sfd, 5);
-  int nsfd = -1;
+  int nsfd = accept (sfd, cliaddr.ai_addr, &cliaddr.ai_addrlen);
 
   for (;;) { 
-    nsfd = accept (sfd, cliaddr.ai_addr, &cliaddr.ai_addrlen);
     if (recv (nsfd, msg, CHAR_LIMIT-1, 0) > 0)
       printf ("%s", msg);
     memset (msg, 0, sizeof(msg));
