@@ -18,9 +18,7 @@ int main (int argc, char * argv[])
     memset (&config, 0, sizeof(struct addrinfo));
     config.ai_family = AF_UNSPEC;
     config.ai_socktype = SOCK_STREAM;
-    config.ai_flags = 0;
-    config.ai_protocol = 0;
-
+   
   struct addrinfo* results;
 
   int gai = getaddrinfo (ip, port, &config, &results);
@@ -47,7 +45,7 @@ int main (int argc, char * argv[])
 
   freeaddrinfo (results);
 
-  write (sfd, "Hello", sizeof("Hello"));
+  send (sfd, "Hello", sizeof("Hello"), 0);
 
   close (sfd);
   return 0;
