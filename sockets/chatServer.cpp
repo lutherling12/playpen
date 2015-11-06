@@ -28,7 +28,7 @@ int main (int argc, char * argv [])
   struct addrinfo cliaddr;
     memset(&cliaddr, 0, sizeof(struct addrinfo));
 
-  char msg [CHAR_LIMIT];
+  char msg [CHAR_LIMIT] = "";
 
   int gai = getaddrinfo (ip, port, &config, &results);
   if (gai != 0) {
@@ -53,21 +53,23 @@ int main (int argc, char * argv [])
   }
 
   freeaddrinfo (results);
-  printf ("Server Binded.\n");
+  printf ("Server Bound.\n");
 
   listen (sfd, 5);
-  int fdClient1 = accept (sfd, cliaddr.ai_addr, &cliaddr.ai_addrlen);
-  int fdClient2 = accept (sfd, cliaddr.ai_addr, &cliaddr.ai_addrlen);
+  int clientfd1 = accept (sfd, cliaddr.ai_addr, &cliaddr.ai_addrlen);
+  int clientfd2 = accept (sfd, cliaddr.ai_addr, &cliaddr.ai_addrlen);
 
   for (;;) {
-    if (recv (fdClient1, msg, CHAR_LIMIT, MSG_DONTWAIT) > 0) {
-      send (fdClient2, msg, sizeof(msg), 0);
-      printf ("%s", msg);
+    if (recv (clientfd1, msg, CHAR_LIMIT, MSG_DONTWAIT) > 0) {
+      send (clientfd2, msg, CHAR_LIMIT, 0);
+      printf (">: %s", msg);
     }
-    if (recv (fdClient2, msg, CHAR_LIMIT, MSG_DONTWAIT) > 0) {
-      send (fdClient1, msg, sizeof(msg), 0);
-      printf ("%s", msg);
+    else if (recv (clientfd2, msg, CHAR_LIMIT, MSG_DONTWAIT) > 0) {
+      send (clientfd1, msg, CHAR_LIMIT, 0);
+      printf ("<: %s", msg);
     }
+
+    memset (msg, 0, sizeof(msg));
   }
 
   close (sfd);

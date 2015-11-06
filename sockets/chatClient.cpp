@@ -9,8 +9,8 @@
 
 #define CHAR_LIMIT 2048
 
-void* sendMsg (void* arg);
-void* recvMsg (void* arg);
+void* clientSend (void*);
+void* clientRecv (void*);
 
 int main (int argc, char * argv[])
 {
@@ -50,32 +50,33 @@ int main (int argc, char * argv[])
 
   freeaddrinfo (results);
 
-  pthread_create (&threads[0], NULL, sendMsg, &sfd);
-  pthread_create (&threads[1], NULL, recvMsg, &sfd);
+  pthread_create (&threads[0], NULL, clientSend, &sfd);
+  pthread_create (&threads[1], NULL, clientRecv, &sfd);
 
-  pthread_exit (NULL);
+  pthread_join (threads[0], NULL);
+
+  close (sfd);
+  return 0;
 }
 
-void* sendMsg (void* arg) {
-  char msg [CHAR_LIMIT];
-    memset (&msg, 0, sizeof(msg));
-
+void* clientSend (void* arg)
+{
+  char msg[CHAR_LIMIT] = "";
   int sfd = (*(int*)arg);
 
   for (;;) {
     fgets (msg, CHAR_LIMIT, stdin);
-    send (sfd, msg, sizeof(msg), 0);
+    send (sfd, msg, sizeof(msg), MSG_DONTWAIT);
   }
 }
 
-void* recvMsg (void* arg) {
-  char msg [CHAR_LIMIT];
-    memset (&msg, 0, sizeof(msg));
-
+void * clientRecv (void* arg)
+{
+  char msg[CHAR_LIMIT] = "";
   int sfd = (*(int*)arg);
 
   for (;;) {
-    if (recv (sfd, msg, sizeof(msg), MSG_DONTWAIT) > 0)
+    if (recv (sfd, msg, CHAR_LIMIT, 0) > 0)
       printf ("%s", msg);
   }
 }
