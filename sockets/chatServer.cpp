@@ -11,7 +11,7 @@
 
 int main (int argc, char * argv [])
 {
-  const char* ip = "192.168.0.13";
+  const char* ip = "127.0.0.1";
   const char* port = "50008";
 
   struct addrinfo config;
@@ -53,14 +53,22 @@ int main (int argc, char * argv [])
   }
 
   freeaddrinfo (results);
-  printf ("Server Binded.\n");
+  printf ("Server Bound.\n");
 
   listen (sfd, 5);
-  int nsfd = accept (sfd, cliaddr.ai_addr, &cliaddr.ai_addrlen);
+  int clientfd1 = accept (sfd, cliaddr.ai_addr, &cliaddr.ai_addrlen);
+  int clientfd2 = accept (sfd, cliaddr.ai_addr, &cliaddr.ai_addrlen);
 
   for (;;) { 
-    if (recv (nsfd, msg, CHAR_LIMIT-1, 0) > 0)
-      printf ("%s", msg);
+    if (recv (clientfd1, msg, CHAR_LIMIT, MSG_DONTWAIT) > 0) {
+      send (clientfd2, msg, CHAR_LIMIT, 0);
+      printf (">: %s", msg);
+    }
+    else if (recv (clientfd2, msg, CHAR_LIMIT, MSG_DONTWAIT) > 0) {
+      send (clientfd1, msg, CHAR_LIMIT, 0);
+      printf ("<: %s", msg);
+    }
+    
     memset (msg, 0, sizeof(msg));
   }
 
