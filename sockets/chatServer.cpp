@@ -12,7 +12,7 @@
 int main (int argc, char * argv [])
 {
   const char* ip = "127.0.0.1";
-  const char* port = "50008";
+  const char* port = "50003";
 
   struct addrinfo config;
     memset(&config, 0, sizeof(struct addrinfo));
@@ -34,11 +34,11 @@ int main (int argc, char * argv [])
   if (gai != 0) {
     fprintf (stderr, "getaddrinfo: %s\n", gai_strerror(gai));
     exit (EXIT_FAILURE);
-  }    
+  }
 
   int sfd = socket (
-    results->ai_family, 
-    results->ai_socktype, 
+    results->ai_family,
+    results->ai_socktype,
     results->ai_protocol
   );
 
@@ -59,7 +59,7 @@ int main (int argc, char * argv [])
   int clientfd1 = accept (sfd, cliaddr.ai_addr, &cliaddr.ai_addrlen);
   int clientfd2 = accept (sfd, cliaddr.ai_addr, &cliaddr.ai_addrlen);
 
-  for (;;) { 
+  for (;;) {
     if (recv (clientfd1, msg, CHAR_LIMIT, MSG_DONTWAIT) > 0) {
       send (clientfd2, msg, CHAR_LIMIT, 0);
       printf (">: %s", msg);
@@ -68,7 +68,7 @@ int main (int argc, char * argv [])
       send (clientfd1, msg, CHAR_LIMIT, 0);
       printf ("<: %s", msg);
     }
-    
+
     memset (msg, 0, sizeof(msg));
   }
 
